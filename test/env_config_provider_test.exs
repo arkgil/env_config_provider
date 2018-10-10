@@ -95,4 +95,12 @@ defmodule EnvConfigProviderTest do
                    assert nil == Application.get_env(:app, :other_nested)
                  end
   end
+
+  test "raises an exception when schema is invalid" do
+    invalid_schema = %{"ENV_VAR" => [:app, "key"]}
+
+    assert_raise EnvConfigProvider.Error, fn ->
+      EnvConfigProvider.init([invalid_schema])
+    end
+  end
 end

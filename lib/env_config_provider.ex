@@ -56,7 +56,11 @@ defmodule EnvConfigProvider do
 
   @impl true
   def init([schema]) do
-    # zamieniamy schemę na coś co zawiera - nazwę zmiennej środowiskowej, jej oryginalną wartość,
-    # sekwencję kluczy (później typecastowaną wartość)
+    with {:ok, blueprint} <- EnvConfigProvider.Blueprint.from_schema(schema) do
+      :ok
+    else
+      {:error, err} ->
+        raise err
+    end
   end
 end
