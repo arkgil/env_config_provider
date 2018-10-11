@@ -109,6 +109,8 @@ defmodule EnvConfigProvider do
   this cannot be reflected in the type specification for `t:app_env_access_path/0` type.
   """
 
+  alias EnvConfigProvider.{Blueprint, SystemEnv}
+
   @behaviour Mix.Releases.Config.Provider
 
   @typedoc """
@@ -135,7 +137,9 @@ defmodule EnvConfigProvider do
 
   @impl true
   def init([schema]) do
-    with {:ok, blueprint} <- EnvConfigProvider.Blueprint.from_schema(schema) do
+    with {:ok, blueprint} <- Blueprint.from_schema(schema),
+         source_env_var_names = Blueprint.get_source_env_var_names(blueprint),
+         env_vars = SystemEnv.get(source_env_var_names) do
       :ok
     else
       {:error, err} ->

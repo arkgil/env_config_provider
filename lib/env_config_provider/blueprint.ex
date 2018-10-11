@@ -61,6 +61,14 @@ defmodule EnvConfigProvider.Blueprint do
     end
   end
 
+  @doc !"""
+       Returns names of all source environment variables defined in the blueprint.
+       """
+  @spec get_source_env_var_names(t()) :: [EnvConfigProvider.env_var_name()]
+  def get_source_env_var_names(blueprint) do
+    Enum.map(blueprint.variables, fn variable -> variable.source_env_var_name end)
+  end
+
   ## Helpers
 
   @spec validate_schema(any()) :: :ok | {:error, Exception.t()}

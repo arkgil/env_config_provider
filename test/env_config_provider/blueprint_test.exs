@@ -40,4 +40,16 @@ defmodule EnvConfigProvider.BlueprintTest do
       assert {:ok, %Blueprint{}} = Blueprint.from_schema(schema)
     end
   end
+
+  test "get_source_env_var_names/0 returns a list of names of all source environment variables " <>
+         "defined in the blueprint" do
+    schema = %{"ENV_VAR_1" => [:app, :key], "ENV_VAR_2" => [:app, :other_key]}
+    {:ok, blueprint} = Blueprint.from_schema(schema)
+
+    source_env_var_names = Blueprint.get_source_env_var_names(blueprint)
+
+    assert map_size(schema) == length(source_env_var_names)
+    assert "ENV_VAR_1" in source_env_var_names
+    assert "ENV_VAR_2" in source_env_var_names
+  end
 end
