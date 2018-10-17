@@ -69,6 +69,22 @@ defmodule EnvConfigProvider.Blueprint do
     Enum.map(blueprint.variables, fn variable -> variable.source_env_var_name end)
   end
 
+  @doc !"""
+       Given name of the source environment variable, returns the access path to corresponding
+       target application environment variable.
+       """
+  @spec get_target_app_env_access_path(t(), EnvConfigProvider.env_var_name()) ::
+          EnvConfigProvider.app_env_access_path()
+  def get_target_app_env_access_path(blueprint, env_var_name) do
+    var =
+      %Variable{} =
+      Enum.find(blueprint.variables, fn variable ->
+        variable.source_env_var_name == env_var_name
+      end)
+
+    var.target_app_env_access_path
+  end
+
   ## Helpers
 
   @spec validate_schema(any()) :: :ok | {:error, Exception.t()}

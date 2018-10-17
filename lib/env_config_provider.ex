@@ -109,7 +109,7 @@ defmodule EnvConfigProvider do
   this cannot be reflected in the type specification for `t:app_env_access_path/0` type.
   """
 
-  alias EnvConfigProvider.{Blueprint, SystemEnv}
+  alias EnvConfigProvider.{Blueprint, SystemEnv, AppEnv}
 
   @behaviour Mix.Releases.Config.Provider
 
@@ -135,15 +135,39 @@ defmodule EnvConfigProvider do
   """
   @type schema :: %{env_var_name() => app_env_access_path()}
 
+  @typedoc !"""
+           The value of application environment variable.
+           """
+  @type app_env_value() :: term()
+
+  @typedoc !"""
+           Mapping between application environment access paths and values which should
+           be set under keys these paths lead to.
+           """
+  @type app_env() :: %{app_env_access_path() => app_env_value()}
+
   @impl true
   def init([schema]) do
     with {:ok, blueprint} <- Blueprint.from_schema(schema),
          source_env_var_names = Blueprint.get_source_env_var_names(blueprint),
-         env_vars = SystemEnv.get(source_env_var_names) do
+         env_vars = SystemEnv.get(source_env_var_names),
+         set_env_vars = Enum.reject(env_vars, fn {_, env_var_value} -> env_var_value == nil end),
+         target_app_env_vars =
+           set_env_vars
+           |> Enum.map(fn {env_var_name, env_var_value} ->
+             target_app_env_access_path =
+               Blueprint.get_target_app_env_access_path(blueprint, env_var_name)
+
+             {target_app_env_access_path, env_var_value}
+           end)
+           |> Enum.into(%{}),
+         AppEnv.merge_with_existing(target_app_env_vars) do
       :ok
     else
       {:error, err} ->
         raise err
     end
   end
+
+  ## Helpers
 end

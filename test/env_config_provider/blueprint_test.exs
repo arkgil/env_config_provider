@@ -52,4 +52,12 @@ defmodule EnvConfigProvider.BlueprintTest do
     assert "ENV_VAR_1" in source_env_var_names
     assert "ENV_VAR_2" in source_env_var_names
   end
+
+  test "get_target_app_env_access_path/2 returns access path to application environment which " <>
+         "given environment variable name maps to" do
+    schema = %{"ENV_VAR" => [:app, :key]}
+    {:ok, blueprint} = Blueprint.from_schema(schema)
+
+    assert [:app, :key] == Blueprint.get_target_app_env_access_path(blueprint, "ENV_VAR")
+  end
 end

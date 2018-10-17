@@ -23,7 +23,7 @@ defmodule EnvConfigProviderTest do
       EnvConfigProvider.init([schema])
 
       assert env_var_1_value == Application.get_env(:app, :key)
-      assert env_var_2_value == Application.get_env(:app, :nested)
+      assert env_var_2_value == Application.get_env(:app, :nested)[:key]
     end
   end
 
