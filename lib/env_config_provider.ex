@@ -26,8 +26,9 @@ defmodule EnvConfigProvider do
       config :lib,
         api_key: <value>
 
-  If the variables were not set, the provider would raise an error. Note that variable values are
-  always strings and are never converted to any other type.
+  where `<value>` is the value of system environment variable from the schema. If any of the
+  variables was not set, the provider would ignore it. Note that variable values are always strings
+  and are never converted to any other type.
 
   The provider not only places values in application environment, but it deeply merges them with
   existing values. Imagine the application environment like this before running the provider:
