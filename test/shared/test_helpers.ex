@@ -35,7 +35,7 @@ defmodule EnvConfigProvider.TestHelpers do
   """
   @spec with_app_env(app_env_vars(), (() -> any())) :: :ok | no_return()
   def with_app_env(app_env_vars, fun) when is_map(app_env_vars) and is_function(fun, 0) do
-    app_env_vars_before = save_app_env_vars(app_env_vars) |> IO.inspect()
+    app_env_vars_before = save_app_env_vars(app_env_vars)
     set_app_env_vars(app_env_vars)
     invoke_with_cleanup(fun, fn -> set_app_env_vars(app_env_vars_before) end)
   end
