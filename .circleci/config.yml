@@ -1,0 +1,69 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/elixir:1.6.6
+    environment:
+      MIX_ENV: "test"
+
+    working_directory: ~/flowx
+
+    steps:
+      - checkout
+
+      - run: mix local.hex --force
+      - run: mix local.rebar --force
+
+      - restore_cache:
+          keys:
+            - v1-deps-cache-{{ .Branch }}-{{ .Revision }}-{{ checksum "mix.lock" }}
+            - v1-deps-cache-{{ .Branch }}-{{ .Revision }}
+            - v1-deps-cache-{{ .Branch }}
+            - v1-deps-cache
+      - run:
+          name: Fetch dependencies
+          command: mix deps.get
+      - save_cache:
+          key: v1-deps-cache-{{ .Branch }}-{{ .Revision }}-{{ checksum "mix.lock" }}
+          paths:
+            - deps
+            - ~/.cache/rebar3
+
+      - restore_cache:
+          keys:
+            - v1-build-cache-{{ .Branch }}-{{ .Revision }}-{{ checksum "mix.lock" }}
+            - v1-build-cache-{{ .Branch }}-{{ .Revision }}
+            - v1-build-cache-{{ .Branch }}
+            - v1-build-cache
+      - run:
+          name: Compile
+          command: mix compile --return-errors
+      - save_cache:
+          key: v1-build-cache-{{ .Branch }}-{{ .Revision }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+
+      - run:
+          name: Ensure formatted code
+          command: mix format --check-formatted
+
+      - run:
+          name: Run tests
+          command: mix test
+
+      - restore_cache:
+          keys:
+            # bump 'v1' to 'v2' when either Erlang or Elixir version changes
+            - v1-plt-cache-{{ .Branch }}-{{ .Revision }}-{{ checksum "mix.lock" }}
+            - v1-plt-cache-{{ .Branch }}-{{ .Revision }}
+            - v1-plt-cache-{{ .Branch }}
+            - v1-plt-cache
+      - run:
+          name: Run dialyzer analysis
+          command: mix dialyzer
+      - save_cache:
+          key: v1-plt-cache-{{ .Branch }}-{{ .Revision }}-{{ checksum "mix.lock" }}
+          paths:
+            - _build
+            - ~/.mix
+
