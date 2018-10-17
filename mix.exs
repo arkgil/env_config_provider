@@ -24,7 +24,8 @@ defmodule EnvConfigProvider.MixProject do
 
   defp preferred_cli_env do
     [
-      docs: :docs
+      docs: :docs,
+      dialyzer: :test
     ]
   end
 
@@ -34,6 +35,7 @@ defmodule EnvConfigProvider.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.18.0", only: :docs, runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.3", only: :test},
       {:distillery, "~> 2.0", runtime: false},
       {:deep_merge, "~> 0.2"}
     ]
