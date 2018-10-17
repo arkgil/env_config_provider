@@ -49,7 +49,7 @@ defmodule EnvConfigProvider.AppEnv do
       # override values under their prefixes.
       |> Enum.sort_by(fn {access_path, _} -> length(access_path) end)
       # Expand the access path and the value into nested keyword list.
-      |> Enum.map(fn {access_path, value} -> make_nested_keyword(access_path, value) end)
+      |> Enum.map(fn {access_path, value} -> expand_nested_keyword(access_path, value) end)
       # Merge with current application environment.
       |> Enum.reduce(existing_env, fn nested_value, env ->
         DeepMerge.deep_merge(env, nested_value)
@@ -67,15 +67,15 @@ defmodule EnvConfigProvider.AppEnv do
        Each atom from the original list except the last one points at the lower-level keyword list.
        Last atom from the list points at the given value.
        """
-  @spec make_nested_keyword(
+  @spec expand_nested_keyword(
           EnvConfigProvider.app_env_access_path(),
           EnvConfigProvider.app_env_value()
         ) :: Keyword.t()
-  defp make_nested_keyword([], value) do
+  defp expand_nested_keyword([], value) do
     value
   end
 
-  defp make_nested_keyword([key | other_keys], value) do
-    [{key, make_nested_keyword(other_keys, value)}]
+  defp expand_nested_keyword([key | other_keys], value) do
+    [{key, expand_nested_keyword(other_keys, value)}]
   end
 end
