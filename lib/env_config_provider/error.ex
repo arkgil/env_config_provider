@@ -5,6 +5,8 @@ defmodule EnvConfigProvider.Error do
 
   defexception [:message]
 
+  @type t :: %__MODULE__{message: String.t()}
+
   ## API
 
   @doc !"""
